@@ -23,12 +23,18 @@ jobs:
         run: |
           gh repo clone rh-openjdk/jtreg-buffer
 
-      - name: Check for changes in CheckAlgorithms.java
+      - name: Check for changes in CheckAlgorithms
         run: |
           diff -u containersQa/CheckAlgorithms.java jtreg-buffer/test/reproducers/checkAlgorithms/CheckAlgorithms.java > CheckAlgorithms.patch
         continue-on-error: true
+
+      - name: Apply patch to CheckAlgorithms
+        if: ${{ steps.check_check_for_changes_in_checkalgorithms.outcome == 'failure' }}
+        run: |
+          patch containersQa/CheckAlgorithms.java CheckAlgorithms.patch
 
       - name: Check for changes in CipherList.java
         run: |
           diff -u containersQa/CipherList.java jtreg-buffer/test/reproducers/1906862/CipherList.java > CipherList.patch
         continue-on-error: true
+
