@@ -23,21 +23,29 @@ jobs:
         run: |
           gh repo clone rh-openjdk/jtreg-buffer
 
-      - name: Check for changes in CheckAlgorithms
+      - name: Check for changes in CheckAlgorithms.java
         run: |
           if diff -u containersQa/CheckAlgorithms.java jtreg-buffer/test/reproducers/checkAlgorithms/CheckAlgorithms.java > CheckAlgorithms.patch; then
-            echo "file_changed=false" >> $GITHUB_ENV
+            echo "checkalgorithms_changed=false" >> $GITHUB_ENV
           else
-            echo "file_changed=true" >> $GITHUB_ENV
+            echo "checkalgorithms_changed=true" >> $GITHUB_ENV
           fi
 
-      - name: Apply patch to CheckAlgorithms
-        if: env.file_changed == 'true'
+      - name: Apply patch to CheckAlgorithms.java
+        if: env.checkalgorithms_changed == 'true'
         run: |
           patch containersQa/CheckAlgorithms.java CheckAlgorithms.patch
 
       - name: Check for changes in CipherList.java
         run: |
-          diff -u containersQa/CipherList.java jtreg-buffer/test/reproducers/1906862/CipherList.java > CipherList.patch
-        continue-on-error: true
+          if diff -u containersQa/CipherList.java jtreg-buffer/test/reproducers/1906862/CipherList.java > CipherList.patch; then
+            echo "cipherlist_changed=false" >> $GITHUB_ENV
+          else
+            echo "cipherlist_changed=true" >> $GITHUB_ENV
+          fi
+
+      - name: Apply patch to CipherList.java
+        if: env.cipherlist_changed == 'true'
+        run: |
+          patch containersQa/CipherList.java CipherList.patch
 
