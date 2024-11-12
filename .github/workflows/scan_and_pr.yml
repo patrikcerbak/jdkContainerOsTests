@@ -17,7 +17,7 @@ jobs:
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
-          gh auth login --with-token < ${{ secrets.TOKEN }}
+          echo ${{ secrets.TOKEN }} | gh auth login --with-token
 
       - name: Clone jtreg-buffer
         run: |
