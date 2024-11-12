@@ -15,7 +15,6 @@ jobs:
 
       - name: Set up Git and GH CLI
         run: |
-          sudo apt-get install gh
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
           gh auth login --with-token < ${{ secrets.GITHUB_TOKEN }}
