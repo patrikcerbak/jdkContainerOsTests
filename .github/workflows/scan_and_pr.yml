@@ -25,5 +25,10 @@ jobs:
 
       - name: Check for changes in CheckAlgorithms.java
         run: |
-          diff containersQa/CheckAlgorithms.java jtreg-buffer/test/reproducers/checkAlgorithms/CheckAlgorithms.java
+          diff -u containersQa/CheckAlgorithms.java jtreg-buffer/test/reproducers/checkAlgorithms/CheckAlgorithms.java > CheckAlgorithms.patch
+        continue-on-error: true
+
+      - name: Check for changes in CipherList.java
+        run: |
+          diff -u containersQa/CipherList.java jtreg-buffer/test/reproducers/1906862/CipherList.java > CipherList.patch
         continue-on-error: true
