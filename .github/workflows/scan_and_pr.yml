@@ -1,0 +1,30 @@
+name: Scan For File Changes in jtreg-buffer and Open a PR
+
+on:
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+jobs:
+  scan_and_pr:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout jdkContainerOsTests
+        uses: actions/checkout@v4
+
+      - name: Set up Git and GH CLI
+        run: |
+          sudo apt-get install gh
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          gh auth login --with-token < ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Clone jtreg-buffer
+        run: |
+          gh repo clone rh-openjdk/jtreg-buffer
+
+      - name: Check for changes in CheckAlgorithms.java
+        run: |
+          diff containersQa/CheckAlgorithms.java jtreg-buffer/test/reproducers/checkAlgorithms/CheckAlgorithms.java
+        continue-on-error: true
