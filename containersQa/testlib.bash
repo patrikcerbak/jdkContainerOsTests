@@ -77,6 +77,7 @@ function pretest() {
   SKIPPED5="!skipped! reproducers security now must be enabled by OTOOL_RUN_SECURITY_REPRODUCERS=true"
   SKIPPED6="!skipped! rhel 7 based images do not support this functionality."
   SKIPPED7="!skipped! rhel 7 Os version of Podman does not support this functionality."
+  SKIPPED8="!skipped! rhel 8 Os version of Podman automatically sets containers to FIPS."
   export DISPLAY=:0
   if [ "x$OTOOL_CONTAINER_RUNTIME" = "x" ] ; then
     export PD_PROVIDER=podman
@@ -111,6 +112,13 @@ function skipIfRhel7Execution() {
 function skipIfRhel7OsExecution() {
   if [ "$OTOOL_OS" == "el.7z"  ] ; then
       echo "$SKIPPED7"
+    exit
+  fi
+}
+
+function skipIfRhel8FipsExecution() {
+  if [ "$OTOOL_OS_NAME" == "el"  ] && [ "$OTOOL_OS_VERSION" == "8" ] && [ "$OTOOL_cryptosetup" == "fips" ] ; then
+      echo "$SKIPPED8"
     exit
   fi
 }
@@ -940,14 +948,13 @@ function setAlgorithmTestsVars {
 
 function listCryptoAlgorithms() {
   skipIfJreExecution
-  # curl downloads the needed test files inside of the container, compiles them and runs them
   runOnBaseDirBash "echo '$checkAlgorithmsCode' > /tmp/CheckAlgorithms.java && echo '$cipherListCode' > /tmp/CipherList.java && \
                     javac -d /tmp /tmp/CheckAlgorithms.java /tmp/CipherList.java && java -cp /tmp CheckAlgorithms list algorithms"
 }
 
 function listCryptoAlgorithmsWithFipsSet() {
   skipIfJreExecution
-  # curl downloads the needed test files inside of the container, compiles them and runs them
+  skipIfRhel8FipsExecution
   runOnBaseDirBashRootUser "update-crypto-policies --set FIPS && \
                             echo '$checkAlgorithmsCode' > /tmp/CheckAlgorithms.java && echo '$cipherListCode' > /tmp/CipherList.java && \
                             javac -d /tmp /tmp/CheckAlgorithms.java /tmp/CipherList.java && java -cp /tmp CheckAlgorithms list algorithms"
@@ -955,14 +962,13 @@ function listCryptoAlgorithmsWithFipsSet() {
 
 function listCryptoProviders() {
   skipIfJreExecution
-  # curl downloads the needed test files inside of the container, compiles them and runs them
   runOnBaseDirBash "echo '$checkAlgorithmsCode' > /tmp/CheckAlgorithms.java && echo '$cipherListCode' > /tmp/CipherList.java && \
                     javac -d /tmp /tmp/CheckAlgorithms.java /tmp/CipherList.java && java -cp /tmp CheckAlgorithms list providers"
 }
 
 function listCryptoProvidersWithFipsSet() {
   skipIfJreExecution
-  # curl downloads the needed test files inside of the container, compiles them and runs them
+  skipIfRhel8FipsExecution
   runOnBaseDirBashRootUser "update-crypto-policies --set FIPS && \
                             echo '$checkAlgorithmsCode' > /tmp/CheckAlgorithms.java && echo '$cipherListCode' > /tmp/CipherList.java && \
                             javac -d /tmp /tmp/CheckAlgorithms.java /tmp/CipherList.java && java -cp /tmp CheckAlgorithms list providers"
