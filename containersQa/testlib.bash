@@ -78,6 +78,7 @@ function pretest() {
   SKIPPED6="!skipped! rhel 7 based images do not support this functionality."
   SKIPPED7="!skipped! rhel 7 Os version of Podman does not support this functionality."
   SKIPPED8="!skipped! rhel 8 Os version of Podman automatically sets containers to FIPS."
+  SKIPPED9="!skipped! no need to disable FIPS, when it is not already there."
   export DISPLAY=:0
   if [ "x$OTOOL_CONTAINER_RUNTIME" = "x" ] ; then
     export PD_PROVIDER=podman
@@ -119,6 +120,13 @@ function skipIfRhel7OsExecution() {
 function skipIfRhel8FipsExecution() {
   if [ "$OTOOL_OS_NAME" == "el"  ] && [ "$OTOOL_OS_VERSION" == "8" ] && [ "$OTOOL_cryptosetup" == "fips" ] ; then
       echo "$SKIPPED8"
+    exit
+  fi
+}
+
+function skipIfFipsExecution() {
+  if [ "$OTOOL_cryptosetup" != "fips" ] ; then
+      echo "$SKIPPED9"
     exit
   fi
 }
@@ -960,6 +968,14 @@ function listCryptoAlgorithmsWithFipsSet() {
                             javac -d /tmp /tmp/CheckAlgorithms.java /tmp/CipherList.java && java -cp /tmp CheckAlgorithms list algorithms"
 }
 
+function listCryptoAlgorithmsWithoutFips() {
+  skipIfJreExecution
+  skipIfFipsExecution
+  runOnBaseDirBashRootUser "fips-mode-setup --disable && \
+                            echo '$checkAlgorithmsCode' > /tmp/CheckAlgorithms.java && echo '$cipherListCode' > /tmp/CipherList.java && \
+                            javac -d /tmp /tmp/CheckAlgorithms.java /tmp/CipherList.java && java -cp /tmp CheckAlgorithms list algorithms"
+}
+
 function listCryptoProviders() {
   skipIfJreExecution
   runOnBaseDirBash "echo '$checkAlgorithmsCode' > /tmp/CheckAlgorithms.java && echo '$cipherListCode' > /tmp/CipherList.java && \
@@ -970,6 +986,14 @@ function listCryptoProvidersWithFipsSet() {
   skipIfJreExecution
   skipIfRhel8FipsExecution
   runOnBaseDirBashRootUser "update-crypto-policies --set FIPS && \
+                            echo '$checkAlgorithmsCode' > /tmp/CheckAlgorithms.java && echo '$cipherListCode' > /tmp/CipherList.java && \
+                            javac -d /tmp /tmp/CheckAlgorithms.java /tmp/CipherList.java && java -cp /tmp CheckAlgorithms list providers"
+}
+
+function listCryptoProvidersWithoutFips() {
+  skipIfJreExecution
+  skipIfFipsExecution
+  runOnBaseDirBashRootUser "fips-mode-setup --disable && \
                             echo '$checkAlgorithmsCode' > /tmp/CheckAlgorithms.java && echo '$cipherListCode' > /tmp/CipherList.java && \
                             javac -d /tmp /tmp/CheckAlgorithms.java /tmp/CipherList.java && java -cp /tmp CheckAlgorithms list providers"
 }
