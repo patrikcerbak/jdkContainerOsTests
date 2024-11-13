@@ -77,7 +77,7 @@ function pretest() {
   SKIPPED5="!skipped! reproducers security now must be enabled by OTOOL_RUN_SECURITY_REPRODUCERS=true"
   SKIPPED6="!skipped! rhel 7 based images do not support this functionality."
   SKIPPED7="!skipped! rhel 7 Os version of Podman does not support this functionality."
-  SKIPPED8="!skipped! rhel 8 Os version of Podman automatically sets containers to FIPS."
+  SKIPPED8="!skipped! rhel 8 or 9 Os version of Podman automatically sets containers to FIPS."
   SKIPPED9="!skipped! no need to disable FIPS, when it is not already there."
   export DISPLAY=:0
   if [ "x$OTOOL_CONTAINER_RUNTIME" = "x" ] ; then
@@ -118,7 +118,7 @@ function skipIfRhel7OsExecution() {
 }
 
 function skipIfRhel8FipsExecution() {
-  if [ "$OTOOL_OS_NAME" == "el"  ] && [ "$OTOOL_OS_VERSION" == "8" ] && [ "$OTOOL_cryptosetup" == "fips" ] ; then
+  if [ "$OTOOL_OS_NAME" == "el"  ] && { [ "$OTOOL_OS_VERSION" == "8" ] || [ "$OTOOL_OS_VERSION" == "9" ]; } && [ "$OTOOL_cryptosetup" == "fips" ] ; then
       echo "$SKIPPED8"
     exit
   fi
