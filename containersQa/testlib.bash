@@ -79,6 +79,7 @@ function pretest() {
   SKIPPED7="!skipped! rhel 7 Os version of Podman does not support this functionality."
   SKIPPED8="!skipped! rhel 8 or 9 Os version of Podman automatically sets containers to FIPS."
   SKIPPED9="!skipped! no need to disable FIPS, when it is not already there."
+  SKIPPED10="!skipped! skipping crypto tests."
   export DISPLAY=:0
   if [ "x$OTOOL_CONTAINER_RUNTIME" = "x" ] ; then
     export PD_PROVIDER=podman
@@ -948,8 +949,11 @@ EOF
 
 function setAlgorithmTestsVars {
   # Turning the tests off for now as there are random failure that are slowing testing for respins.
-  echo $SKIPPED3
-  exit
+  if [ "$OTOOL_CONTAINERQA_RUNCRYPTO" != "true"  ] ; then
+    echo "$SKIPPED10"
+    exit
+  fi
+
   checkAlgorithmsCode=`cat $LIBCQA_SCRIPT_DIR/CheckAlgorithms.java | sed -e "s/'//g"` # the ' characters are escaping and making problems, deleting them here
   cipherListCode=`cat $LIBCQA_SCRIPT_DIR/CipherList.java`
 }
