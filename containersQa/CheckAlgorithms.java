@@ -15,7 +15,7 @@ public class CheckAlgorithms {
     public static void main(String[] args) throws Exception {
         if (args.length != 2 || args[0].equals("--help") || args[0].equals("-h")) {
             System.err.println("Test for listing available algorithms and providers and checking their FIPS compatibility");
-            System.err.println("Usage: cryptoAlgorithmTesting.CheckAlgorithms " + possibleFirstArgs + " " + possibleSecondArgs);
+            System.err.println("Usage: CheckAlgorithms " + possibleFirstArgs + " " + possibleSecondArgs);
             System.err.println("First argument: specify whether to check FIPS compatibility (assert/true) or just list the items (list/false)");
             System.err.println("                silent-asserts just asserts, not lists the items");
             System.err.println("Second argument: specify what to check - algorithms, providers or both");
@@ -102,7 +102,7 @@ public class CheckAlgorithms {
     }
 
     static boolean algorithmAssert() throws Exception {
-        List<String> algorithms = List.of(CipherList.getCipherList());
+        List<String> algorithms = Arrays.asList(CipherList.getCipherList());
         boolean allOk = true;
 
         // assert that algorithms list contains all FIPS_ALGORITHMS
